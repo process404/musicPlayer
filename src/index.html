@@ -4,15 +4,29 @@
     <meta charset="UTF-8" />
     <title>Hello World!</title>
     <link rel="stylesheet" href="./css/output.css"/>
+    <link rel="stylesheet" href="./css/additional.css"/>
     <script src="./js/music.js" defer></script>
   </head>
   <body class="h-screen">
     <h1>💖 Hello World!</h1>
-    <p>Welcome to your Electron application.</p>
+    <p></p>
     <h1 class="mt-8">Set music directory</h1>
     <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
 
-    <h1 id="playClick" class="mt-8">Click to play</h1>
+
+    <div id="playbar" class="fixed w-screen bottom-0 h-16 left-0 bg-zinc-800 flex items-center justify-between pl-[5%] pr-[5%]">
+      <div class="flex gap-4">
+        <h1 class="text-white text-opacity-50 hover:text-opacity-100 text-2xl" id="playClick">
+          ▶
+        </h1>
+        <h1 class="text-white opacity-10 hover:cursor-not-allowed text-2xl" id="stopClick">
+          ■
+        </h1>
+      </div>
+      <div>
+        <h1 id="nowPlaying" class="text-white"></h1>
+      </div>
+    </div>
     
   </body>
 </html>

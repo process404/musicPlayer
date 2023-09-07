@@ -3,13 +3,21 @@ window.$ = window.jQuery = require('jquery');
 
 var playing = false;
 
-var sound = new Howl({
-    src: ['./mp3/test_sound_scotrail.mp3'],
-    onend: function(){
-        playing = false
-        $('#playClick').text("Click to play")
-    }
-});
+var sound;
+
+function loadSound(src){
+    sound = new Howl({
+        src: './mp3/test_sound_scotrail.mp3',
+        onend: function(){
+            playing = false
+            $('#playClick').text("▶")
+            $('#stopClick').toggleClass("active")
+        }
+    });
+
+    $('#nowPlaying').text(src.split("/")[2])
+}
+
 
 
 $('#playClick').on("click", function(){
@@ -17,10 +25,25 @@ $('#playClick').on("click", function(){
     if(playing){
         sound.pause()
         playing = false
-        $('#playClick').text("Click to play")
+        $('#playClick').text("▶")
+        $('#stopClick').toggleClass("active")
     }else{
         sound.play()
         playing = true
-        $('#playClick').text("Click to pause")
+        $('#playClick').text("⏸")
+        $('#stopClick').toggleClass("active")
     }
 })
+
+$('#stopClick').on("click", function(){
+    if(playing){
+        sound.stop()
+        playing = false;
+        $('#playClick').text("▶")
+        $('#stopClick').toggleClass("active")
+    }
+})
+
+loadSound('./mp3/test_sound_scotrail.mp3')
+
+

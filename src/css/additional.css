@@ -1,0 +1,5 @@
+
+.active:hover{
+    cursor: pointer;
+    opacity: 100;
+}
