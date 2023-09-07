@@ -534,6 +534,10 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.mt-8 {
+  margin-top: 2rem;
+}
+
 .h-screen {
   height: 100vh;
 }

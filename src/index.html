@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <title>Hello World!</title>
-    <link rel="stylesheet" href="./css/output.css" />
+    <link rel="stylesheet" href="./css/output.css"/>
     <script src="./js/music.js" defer></script>
   </head>
   <body class="h-screen">
     <h1>💖 Hello World!</h1>
     <p>Welcome to your Electron application.</p>
-    <h1 id="playClick">Click to play</h1>
+    <h1 class="mt-8">Set music directory</h1>
+    <input type="file" id="filepicker" name="fileList" webkitdirectory multiple />
+
+    <h1 id="playClick" class="mt-8">Click to play</h1>
+    
   </body>
 </html>
