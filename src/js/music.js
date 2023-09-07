@@ -1,7 +1,7 @@
 const { Howl, Howler } = require('howler');
 
 var sound = new Howl({
-    src: ['./mp3/announcements_0012.mp3']
+    src: ['./mp3/test_sound_scotrail.mp3']
     });
     
     Howler.volume = 1
