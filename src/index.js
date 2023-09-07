@@ -1,6 +1,8 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { Howl, Howler } = require('howler');
+var $ = require( "jquery" );
+
 
 const isDev = process.env.NODE_ENV !== 'development';
 
