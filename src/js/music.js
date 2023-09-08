@@ -18,8 +18,6 @@ function loadSound(src){
     $('#nowPlaying').text(src.split("/")[2])
 }
 
-
-
 $('#playClick').on("click", function(){
 
     if(playing){
@@ -42,6 +40,11 @@ $('#stopClick').on("click", function(){
         $('#playClick').text("▶")
         $('#stopClick').toggleClass("active")
     }
+})
+
+$('#filePicker').on("change", function(e){
+    console.log("hi")
+    console.log(e.target.files[0])
 })
 
 loadSound('./mp3/test_sound_scotrail.mp3')
