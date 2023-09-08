@@ -8,23 +8,36 @@
     <script src="./js/music.js" defer></script>
   </head>
   <body class="h-screen">
+    <div id="toasty" class="items-center justify-center fixed h-screen top-0 left-0 bg-black bg-opacity-80 z-30 w-screen pb-8 hidden">
+      <div class="bg-red-800 text-2xl p-4 rounded-md error hidden">
+        <h1 class="text-white font-bold text-center">Error</h1>
+        <h2 class="text-white text-center text-sm mt-2 message">Message goes here</h2>
+      </div>
+      <div class="bg-green-800 text-2xl p-4 rounded-md success hidden">
+        <h1 class="text-white font-bold text-center">Success</h1>
+        <h2 class="text-white text-center text-sm mt-2 message">Message goes here</h2>
+      </div>
+
+    </div>
     <h1>💖 Hello World!</h1>
     <p></p>
-    <h1 class="mt-8">Add files from folder</h1>
-    <input type="file" id="filePicker" name="fileList" webkitdirectory multiple />
+    <h1 class="mt-8">Choose Folder</h1>
+    <form id="fileForm">
+      <input type="file" id="filePicker" name="fileList" webkitdirectory multiple />
+    </form>
 
 
     <div id="playbar" class="fixed w-screen bottom-0 h-16 left-0 bg-zinc-800 flex items-center justify-between pl-[5%] pr-[5%]">
       <div class="flex gap-4">
-        <h1 class="text-white text-opacity-50 hover:text-opacity-100 text-2xl" id="playClick">
+        <h2 class="text-white text-opacity-50 hover:text-opacity-100 text-2xl" id="playClick">
           ▶
-        </h1>
-        <h1 class="text-white opacity-10 hover:cursor-not-allowed text-2xl" id="stopClick">
+        </h2>
+        <h2 class="text-white opacity-10 hover:cursor-not-allowed text-2xl" id="stopClick">
           ■
-        </h1>
+        </h2>
       </div>
       <div>
-        <h1 id="nowPlaying" class="text-white"></h1>
+        <h2 id="nowPlaying" class="text-white"></h2>
       </div>
     </div>
     

@@ -3,3 +3,11 @@
     cursor: pointer;
     opacity: 100;
 }
+
+.toastyActive{
+    display: flex;
+}
+
+.messageActive{
+    display: block;
+}
