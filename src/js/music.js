@@ -105,10 +105,11 @@ $(document).on("click", '.libraryItem', function(e){
     // console.log(e.currentTarget.innerText)
     var rootPath = store.get('root_path')
     soundStop()
+    var path = $(this).attr('data-path')
     fs.readdir(rootPath , async function(err,files){
         for(var file in files){
-            if(files[file].includes(e.currentTarget.innerText)){
-                loadSound(rootPath + files[file], files[file])
+            if(files[file].includes(path)){
+                loadSound(rootPath + files[file], path)
                 sound.play()
                 playing = true
                 $('#playClick').text("⏸")
@@ -124,17 +125,26 @@ $(document).on("click", '.libraryItem', function(e){
 async function loadLibrary(){
     var rootPath = store.get('root_path')
     fs.readdir(rootPath , async function(err,files){
+        var counter = 0
         for(file in files){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 var metadata = await mm.parseFile(rootPath + "\\" + path)
                 console.log(path, metadata)
-                if(metadata.common.picture.length != 0){
-                    
-                    $('#library ul').append(`<img src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
+                const divBuilder = $('#library ul').append(`<div data-path='${path}' class="libItem_${counter} w-[32%] relative libraryItem"></div>`)
+                if(metadata.common.picture != null){
+                    $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
+                    $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
+                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-center text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
+                    $(`.libItem_${counter}`).append(`<h2 class="hidden songInformation">${path}</h2>`)
+                }else{
+                    $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
+                    $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="./storage/blank_icon.jpg"/>`)
+                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-center text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
+                    $(`.libItem_${counter}`).append(`<h2 class="hidden songInformation">${path}</h2>`)
                 }
-                $('#library ul').append(`<div class="libraryItem text-white"><h2>${files[file].slice(0,-4)}</h2></div>`)
             }
+            counter++
         }
     })
 }
