@@ -57,7 +57,7 @@ async function triggerToast(type,msg, arr){
  
 function loadSound(src){
     sound = new Howl({
-        src: './mp3/test_sound_scotrail.mp3',
+        src: src,
         onend: function(){
             playing = false
             $('#playClick').text("▶")
@@ -92,6 +92,30 @@ $('#stopClick').on("click", function(){
     }
 })
 
+$(document).on("click", '.libraryItem', function(e){
+    console.log(e.currentTarget.innerText)
+    const storeFiles = store.get('music_files')
+    for(file in storeFiles){
+        if(storeFiles[file].name.includes(e.currentTarget.innerText)){
+            console.log("found")
+            console.log(storeFiles[file].path)
+            loadSound(storeFiles[file].path)
+            sound.play()
+            $('#playClick').text("⏸")
+            $('#stopClick').toggleClass("active")
+            return;
+        }
+    }
+})
+
+function loadLibrary(){
+    const storeFiles = store.get('music_files')
+    for(file in storeFiles){
+        $('#library ul').append(`<div class="libraryItem"><h2>${storeFiles[file].name.slice(0,-4)}</h2></div>`)
+    }
+}
+
+
 $('#filePicker').on("change", async function(e){
     // console.log(e.target.files[1].path)  
     var newObj = []
@@ -103,7 +127,7 @@ $('#filePicker').on("change", async function(e){
         var path = e.target.files[file].path
         if(path != undefined){
             if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
-                newObj.push({"path":path})
+                newObj.push({"path":path,"name":e.target.files[file].name})
                 successImports++
                 if(successImports < 5){
                     if(e.target.files[file].name){
@@ -134,8 +158,9 @@ $('#filePicker').on("change", async function(e){
     }
 
     $('fileForm').val('');
+    loadLibrary()
 })
 
-loadSound('./mp3/test_sound_scotrail.mp3')
+// loadSound('./mp3/test_sound_scotrail.mp3')
 
 
