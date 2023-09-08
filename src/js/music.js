@@ -8,6 +8,8 @@ const fs = require('fs');
 var playing = false;
 var sound;
 
+const acceptedFiles = [".mp3",".wav"]
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -66,7 +68,7 @@ function loadSound(src, name){
         }
     });
 
-    $('#nowPlaying').text(name.slice(0,-3))
+    $('#nowPlaying').text(name.slice(0,-4))
 }
 
 $('#playClick').on("click", function(){
@@ -125,7 +127,7 @@ function loadLibrary(){
         for(file in files){
             var path = files[file]
             if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
-                $('#library ul').append(`<div class="libraryItem"><h2>${files[file].slice(0,-4)}</h2></div>`)
+                $('#library ul').append(`<div class="libraryItem text-white"><h2>${files[file].slice(0,-4)}</h2></div>`)
             }
         }
     })
@@ -147,7 +149,7 @@ $('#filePicker').on("change", async function(e){
         console.log(files);
         for(const file in files){
             var path = files[file]
-            if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
+            if(acceptedFiles.includes(path.toLowerCase())){
                 successImports++
                 if(successImports < 5){
                     if(files[file]){
