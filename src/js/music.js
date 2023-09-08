@@ -2,6 +2,7 @@ const { Howl, Howler } = require('howler');
 window.$ = window.jQuery = require('jquery');
 const Store = require('electron-store');
 const store = new Store();
+const fs = require('fs');
 
 
 var playing = false;
@@ -83,36 +84,51 @@ $('#playClick').on("click", function(){
     }
 })
 
-$('#stopClick').on("click", function(){
+function soundStop(){
     if(playing){
         sound.stop()
         playing = false;
         $('#playClick').text("▶")
         $('#stopClick').toggleClass("active")
     }
+}
+
+$('#stopClick').on("click", function(){
+    soundStop()
 })
 
 $(document).on("click", '.libraryItem', function(e){
     console.log(e.currentTarget.innerText)
-    const storeFiles = store.get('music_files')
-    for(file in storeFiles){
-        if(storeFiles[file].name.includes(e.currentTarget.innerText)){
-            console.log("found")
-            console.log(storeFiles[file].path)
-            loadSound(storeFiles[file].path)
-            sound.play()
-            $('#playClick').text("⏸")
-            $('#stopClick').toggleClass("active")
-            return;
+    var rootPath = store.get('root_path')
+    soundStop()
+    fs.readdir(rootPath , async function(err,files){
+        for(var file in files){
+            if(files[file].includes(e.currentTarget.innerText)){
+                console.log("found")
+                console.log(files[file])
+                loadSound(rootPath + files[file])
+                sound.play()
+                playing = true
+                $('#playClick').text("⏸")
+                $('#stopClick').toggleClass("active")
+                return;
+            }
         }
-    }
+    })
+
+
 })
 
 function loadLibrary(){
-    const storeFiles = store.get('music_files')
-    for(file in storeFiles){
-        $('#library ul').append(`<div class="libraryItem"><h2>${storeFiles[file].name.slice(0,-4)}</h2></div>`)
-    }
+    var rootPath = store.get('root_path')
+    fs.readdir(rootPath , async function(err,files){
+        for(file in files){
+            var path = files[file]
+            if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
+                $('#library ul').append(`<div class="libraryItem"><h2>${files[file].slice(0,-4)}</h2></div>`)
+            }
+        }
+    })
 }
 
 
@@ -123,45 +139,57 @@ $('#filePicker').on("change", async function(e){
     var successArr = []
     var failedImports = 0;
     var successImports = 0;
-    for(const file in e.target.files){
-        var path = e.target.files[file].path
-        if(path != undefined){
+    console.log(e)
+    var rootPath = e.target.files[0].path.split(`\\`)[0] + "\\" + e.target.files[0].path.split(`\\`)[1] + "\\" + e.target.files[0].path.split(`\\`)[2] + "\\" + e.target.files[0].path.split(`\\`)[3] + "\\" + "\\" + e.target.files[0].path.split(`\\`)[4] + "\\"
+    store.set('root_path',rootPath)
+    console.log(rootPath)
+    fs.readdir(rootPath , async function(err,files){
+        console.log(files);
+        for(const file in files){
+            var path = files[file]
             if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
-                newObj.push({"path":path,"name":e.target.files[file].name})
                 successImports++
                 if(successImports < 5){
-                    if(e.target.files[file].name){
-                        successArr.push(e.target.files[file].name)
+                    if(files[file]){
+                        successArr.push(files[file])
                     }
                 }
             }else{
                 if(failedImports < 5){
-                    if(e.target.files[file].name){
-                        failedArr.push(e.target.files[file].name)
+                    if(files[file]){
+                        failedArr.push(files[file])
                     }
                 }
                 failedImports++
             }
+        }  
+
+        if(successImports != 0){
+            triggerToast("s",`${successImports} files succesfully imported.`, successArr)
+            await sleep(5100);
         }
-    }   
+    
+        if(failedImports > 0){
+            triggerToast("e",`${failedImports} files failed to import.`, failedArr)
+        }
 
-    store.set('music_files', newObj)
-    console.log(store.get())
+        $('fileForm').val('');
+        loadLibrary()
+    })
 
-    if(successImports != 0){
-        triggerToast("s",`${successImports} files succesfully imported.`, successArr)
-        await sleep(5100);
-    }
 
-    if(failedImports > 0){
-        triggerToast("e",`${failedImports} files failed to import.`, failedArr)
-    }
 
-    $('fileForm').val('');
-    loadLibrary()
+
+    
 })
 
 // loadSound('./mp3/test_sound_scotrail.mp3')
 
-loadLibrary()
+
+if(store.get('root_path')){
+    loadLibrary()
+    $('#filePickerLabel').text("Click to rechoose!")
+    $('#folderName').text("Folder:⠀⠀" + store.get('root_path'))
+    $('#folderName').toggleClass('hidden')
+}
 

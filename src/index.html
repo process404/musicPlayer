@@ -33,12 +33,16 @@
     </div>
     <h1>💖 Hello World!</h1>
     <p></p>
-    <h1 class="mt-8">Choose Folder</h1>
-    <form id="fileForm">
-      <input type="file" id="filePicker" name="fileList" webkitdirectory multiple />
-    </form>
+    <!-- <h1 class="mt-8">Choose Folder</h1> -->
+    <div id="folderChoose" class="mt-8 mb-8">
+      <form id="fileForm">
+        <h3 id="folderName" class="hidden">Folder: </h3>
+        <label for="filePicker" id="filePickerLabel">Choose Folder</label>
+        <input type="file" id="filePicker" name="fileList" class="hidden" webkitdirectory directory multiple />
+      </form>
+    </div>
 
-    <div id="library">
+    <div id="library" class="mt-8">
       <ul>
 
       </ul>
