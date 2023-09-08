@@ -163,4 +163,5 @@ $('#filePicker').on("change", async function(e){
 
 // loadSound('./mp3/test_sound_scotrail.mp3')
 
+loadLibrary()
 
