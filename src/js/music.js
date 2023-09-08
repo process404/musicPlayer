@@ -3,6 +3,8 @@ window.$ = window.jQuery = require('jquery');
 const Store = require('electron-store');
 const store = new Store();
 const fs = require('fs');
+const mm = require('music-metadata');
+const util = require('util');
 
 
 var playing = false;
@@ -100,14 +102,12 @@ $('#stopClick').on("click", function(){
 })
 
 $(document).on("click", '.libraryItem', function(e){
-    console.log(e.currentTarget.innerText)
+    // console.log(e.currentTarget.innerText)
     var rootPath = store.get('root_path')
     soundStop()
     fs.readdir(rootPath , async function(err,files){
         for(var file in files){
             if(files[file].includes(e.currentTarget.innerText)){
-                console.log("found")
-                console.log(files[file])
                 loadSound(rootPath + files[file], files[file])
                 sound.play()
                 playing = true
@@ -121,12 +121,18 @@ $(document).on("click", '.libraryItem', function(e){
 
 })
 
-function loadLibrary(){
+async function loadLibrary(){
     var rootPath = store.get('root_path')
     fs.readdir(rootPath , async function(err,files){
         for(file in files){
             var path = files[file]
-            if(path.toLowerCase().includes(".mp3") || path.toLowerCase().includes(".wav")){
+            if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
+                var metadata = await mm.parseFile(rootPath + "\\" + path)
+                console.log(path, metadata)
+                if(metadata.common.picture.length != 0){
+                    
+                    $('#library ul').append(`<img src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
+                }
                 $('#library ul').append(`<div class="libraryItem text-white"><h2>${files[file].slice(0,-4)}</h2></div>`)
             }
         }
@@ -141,7 +147,7 @@ $('#filePicker').on("change", async function(e){
     var successArr = []
     var failedImports = 0;
     var successImports = 0;
-    console.log(e)
+    // console.log(e)
     var rootPath = e.target.files[0].path.split(`\\`)[0] + "\\" + e.target.files[0].path.split(`\\`)[1] + "\\" + e.target.files[0].path.split(`\\`)[2] + "\\" + e.target.files[0].path.split(`\\`)[3] + "\\" + "\\" + e.target.files[0].path.split(`\\`)[4] + "\\"
     store.set('root_path',rootPath)
     console.log(rootPath)
@@ -149,7 +155,7 @@ $('#filePicker').on("change", async function(e){
         console.log(files);
         for(const file in files){
             var path = files[file]
-            if(acceptedFiles.includes(path.toLowerCase())){
+            if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 successImports++
                 if(successImports < 5){
                     if(files[file]){
@@ -167,7 +173,7 @@ $('#filePicker').on("change", async function(e){
         }  
 
         if(successImports != 0){
-            triggerToast("s",`${successImports} files succesfully imported.`, successArr)
+            triggerToast("s",`Folder successfully set!`, successArr)
             await sleep(5100);
         }
     
