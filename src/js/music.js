@@ -56,7 +56,7 @@ async function triggerToast(type,msg, arr){
 }
 
  
-function loadSound(src){
+function loadSound(src, name){
     sound = new Howl({
         src: src,
         onend: function(){
@@ -66,7 +66,7 @@ function loadSound(src){
         }
     });
 
-    $('#nowPlaying').text(src.split("/")[2])
+    $('#nowPlaying').text(name.slice(0,-3))
 }
 
 $('#playClick').on("click", function(){
@@ -106,7 +106,7 @@ $(document).on("click", '.libraryItem', function(e){
             if(files[file].includes(e.currentTarget.innerText)){
                 console.log("found")
                 console.log(files[file])
-                loadSound(rootPath + files[file])
+                loadSound(rootPath + files[file], files[file])
                 sound.play()
                 playing = true
                 $('#playClick').text("⏸")
