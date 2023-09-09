@@ -102,22 +102,35 @@ $('#stopClick').on("click", function(){
 })
 
 $(document).on("click", '.libraryItem', function(e){
-    // console.log(e.currentTarget.innerText)
-    var rootPath = store.get('root_path')
-    soundStop()
-    var path = $(this).attr('data-path')
-    fs.readdir(rootPath , async function(err,files){
-        for(var file in files){
-            if(files[file].includes(path)){
-                loadSound(rootPath + files[file], path)
-                sound.play()
-                playing = true
-                $('#playClick').text("⏸")
-                $('#stopClick').toggleClass("active")
-                return;
+    if($(this).attr('data-playing') == 'true'){
+        $('.libraryItem').text("▶")
+        sound.pause()
+        $(this).attr('data-playing', false)
+        $('#playClick').text("▶")
+        return;
+    }else{
+        $('.libraryItem').text("▶")
+        // console.log(e.currentTarget.innerText)
+        var rootPath = store.get('root_path')
+        soundStop()
+        var path = $(this).attr('data-path')
+        fs.readdir(rootPath , async function(err,files){
+            for(var file in files){
+                if(files[file].includes(path)){
+                    loadSound(rootPath + files[file], path)
+                    sound.play()
+                    playing = true
+                    $('#playClick').text("⏸")
+                    $('#stopClick').toggleClass("active")
+                    return;
+                }
             }
-        }
-    })
+        })
+
+        $(this).attr('data-playing', true)
+        $(this).text("⏸")
+    
+    }
 
 
 })
@@ -131,17 +144,17 @@ async function loadLibrary(){
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 var metadata = await mm.parseFile(rootPath + "\\" + path)
                 console.log(path, metadata)
-                const divBuilder = $('#library ul').append(`<div data-path='${path}' class="libItem_${counter} w-[32%] relative libraryItem"></div>`)
+                const divBuilder = $('#library ul').append(`<div class="libItem_${counter} w-[32%] relative"></div>`)
                 if(metadata.common.picture != null){
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
-                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-center text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter}`).append(`<h2 class="hidden songInformation">${path}</h2>`)
+                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem" data-path='${path}' data-playing='false'>▶</button></div>`)
                 }else{
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="./storage/blank_icon.jpg"/>`)
-                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-center text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter}`).append(`<h2 class="hidden songInformation">${path}</h2>`)
+                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white" data-path='${path}' data-playing='false'>▶</button></div>`)
                 }
             }
             counter++
