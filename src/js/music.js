@@ -94,6 +94,9 @@ function soundStop(){
         playing = false;
         $('#playClick').text("▶")
         $('#stopClick').toggleClass("active")
+        $('.libraryItem').text("▶")
+        $('.libraryItem').attr("data-playing", false)
+        $('.libraryItem').attr("data-paused", false)
     }
 }
 
@@ -102,33 +105,40 @@ $('#stopClick').on("click", function(){
 })
 
 $(document).on("click", '.libraryItem', function(e){
-    if($(this).attr('data-playing') == 'true'){
+    if($(this).attr('data-playing') == 'true' && $(this).attr('data-paused') == 'false'){
         $('.libraryItem').text("▶")
         sound.pause()
-        $(this).attr('data-playing', false)
+        $(this).attr('data-paused', true)
         $('#playClick').text("▶")
         return;
     }else{
-        $('.libraryItem').text("▶")
-        // console.log(e.currentTarget.innerText)
-        var rootPath = store.get('root_path')
-        soundStop()
-        var path = $(this).attr('data-path')
-        fs.readdir(rootPath , async function(err,files){
-            for(var file in files){
-                if(files[file].includes(path)){
-                    loadSound(rootPath + files[file], path)
-                    sound.play()
-                    playing = true
-                    $('#playClick').text("⏸")
-                    $('#stopClick').toggleClass("active")
-                    return;
+        if($(this).attr('data-paused') == 'true'){
+            sound.play()
+            $(this).attr('data-paused', false)
+            $(this).text("⏸")
+            $('#playClick').text("⏸")
+        }else{
+            $('.libraryItem').text("▶")
+            // console.log(e.currentTarget.innerText)
+            var rootPath = store.get('root_path')
+            soundStop()
+            var path = $(this).attr('data-path')
+            fs.readdir(rootPath , async function(err,files){
+                for(var file in files){
+                    if(files[file].includes(path)){
+                        loadSound(rootPath + files[file], path)
+                        sound.play()
+                        playing = true
+                        $('#playClick').text("⏸")
+                        $('#stopClick').toggleClass("active")
+                        return;
+                    }
                 }
-            }
-        })
+            })
+            $(this).attr('data-playing', true)
+            $(this).text("⏸")
+        }
 
-        $(this).attr('data-playing', true)
-        $(this).text("⏸")
     
     }
 
@@ -143,18 +153,18 @@ async function loadLibrary(){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 var metadata = await mm.parseFile(rootPath + "\\" + path)
-                console.log(path, metadata)
+                // console.log(path, metadata)
                 const divBuilder = $('#library ul').append(`<div class="libItem_${counter} w-[32%] relative"></div>`)
                 if(metadata.common.picture != null){
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
                     $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem pl-4 pr-4" data-path='${path}' data-playing='false'>▶</button></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem pl-4 pr-4" data-path='${path}' data-playing='false' data-paused='false'>▶</button></div>`)
                 }else{
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="./storage/blank_icon.jpg"/>`)
                     $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white pl-4 pr-4" data-path='${path}' data-playing='false'>▶</button></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white pl-4 pr-4" data-path='${path}' data-playing='false' data-paused='false'>▶</button></div>`)
                 }
             }
             counter++
