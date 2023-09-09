@@ -23,14 +23,14 @@ async function triggerToast(type,msg, arr){
         $('#toasty .success .message').text(msg)
         $('#toasty').toggleClass('hidden')
         $('#toasty').toggleClass('flex')
-        if(arr != null || arr.length != 0){
+        if(arr != null){
             for(item in arr){
                 $('#toasty .success .list').append(`<li class='text-white appearance-none text-sm list-none'> ${arr[item]}</li>`)
             }
             $('#toasty .success .list').toggleClass('hidden')
         }
-        await sleep(5000);
-        if(arr != null || arr.length != 0){
+        await sleep(3000);
+        if(arr != null){
             $('#toasty .success .list ul').empty()
             $('#toasty .success .list').toggleClass('hidden')
         }
@@ -40,7 +40,7 @@ async function triggerToast(type,msg, arr){
     }else if(type=="e"){
         $('#toasty .error').toggleClass('hidden')
         $('#toasty .error .message').text(msg)
-        if(arr != null || arr.length != 0){
+        if(arr != null){
             for(item in arr){
                 $('#toasty .error .list').append(`<li class='text-white appearance-none text-sm list-none'> ${[arr[item]]}</li>`)
             }
@@ -48,8 +48,8 @@ async function triggerToast(type,msg, arr){
         }
         $('#toasty').toggleClass('hidden')
         $('#toasty').toggleClass('flex')
-        await sleep(5000);
-        if(arr != null || arr.length != 0){
+        await sleep(3000);
+        if(arr != null){
             $('#toasty .error .list ul').empty()
             $('#toasty .error .list').toggleClass('hidden')
         }
@@ -149,12 +149,12 @@ async function loadLibrary(){
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
                     $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem" data-path='${path}' data-playing='false'>▶</button></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem pl-4 pr-4" data-path='${path}' data-playing='false'>▶</button></div>`)
                 }else{
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="./storage/blank_icon.jpg"/>`)
                     $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white" data-path='${path}' data-playing='false'>▶</button></div>`)
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white pl-4 pr-4" data-path='${path}' data-playing='false'>▶</button></div>`)
                 }
             }
             counter++
@@ -174,17 +174,19 @@ $('#filePicker').on("change", async function(e){
     var rootPath = e.target.files[0].path.split(`\\`)[0] + "\\" + e.target.files[0].path.split(`\\`)[1] + "\\" + e.target.files[0].path.split(`\\`)[2] + "\\" + e.target.files[0].path.split(`\\`)[3] + "\\" + "\\" + e.target.files[0].path.split(`\\`)[4] + "\\"
     store.set('root_path',rootPath)
     console.log(rootPath)
+    $('#folderName').text("Folder:⠀⠀" + rootPath)
     fs.readdir(rootPath , async function(err,files){
         console.log(files);
         for(const file in files){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 successImports++
-                if(successImports < 5){
-                    if(files[file]){
-                        successArr.push(files[file])
-                    }
-                }
+                successArr = null;
+                // if(successImports < 5){
+                //     if(files[file]){
+                //         successArr.push(files[file])
+                //     }
+                // }
             }else{
                 if(failedImports < 5){
                     if(files[file]){
@@ -197,7 +199,7 @@ $('#filePicker').on("change", async function(e){
 
         if(successImports != 0){
             triggerToast("s",`Folder successfully set!`, successArr)
-            await sleep(5100);
+            await sleep(3100);
         }
     
         if(failedImports > 0){
