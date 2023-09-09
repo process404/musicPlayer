@@ -144,7 +144,7 @@ $(document).on("click", '.libraryItem', function(e){
                 for(var file in files){
                     if(files[file].includes(path)){
                         var metadata = await mm.parseFile(rootPath + "\\" + files[file])
-                        console.log(metadata)
+                        // console.log(metadata)
                         loadSound(rootPath + files[file], path, metadata.common.artist)
                         sound.play()
                         playing = true
@@ -172,7 +172,7 @@ async function loadLibrary(){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 var metadata = await mm.parseFile(rootPath + "\\" + path)
-                console.log(path, metadata)
+                // console.log(path, metadata)
                 const divBuilder = $('#library ul').append(`<div class="libItem_${counter} md:w-[32%] sm:w-[48%] w-full relative overflow-hidden"></div>`)
                 if(metadata.common.picture != null){
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
@@ -210,10 +210,10 @@ $('#filePicker').on("change", async function(e){
     // console.log(e)
     var rootPath = e.target.files[0].path.split(`\\`)[0] + "\\" + e.target.files[0].path.split(`\\`)[1] + "\\" + e.target.files[0].path.split(`\\`)[2] + "\\" + e.target.files[0].path.split(`\\`)[3] + "\\" + "\\" + e.target.files[0].path.split(`\\`)[4] + "\\"
     store.set('root_path',rootPath)
-    console.log(rootPath)
+    // console.log(rootPath)
     $('#folderName').text("Folder:⠀⠀" + rootPath)
     fs.readdir(rootPath , async function(err,files){
-        console.log(files);
+        // console.log(files);
         for(const file in files){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
