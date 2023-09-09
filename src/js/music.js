@@ -67,6 +67,9 @@ function loadSound(src, name){
             playing = false
             $('#playClick').text("▶")
             $('#stopClick').toggleClass("active")
+            $('.libraryItem').text("▶")
+            $('.libraryItem').attr('data-playing',false)
+            $('.libraryItem').attr('data-paused',false)
         }
     });
 
