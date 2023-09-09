@@ -60,7 +60,7 @@ async function triggerToast(type,msg, arr){
 }
 
  
-function loadSound(src, name){
+function loadSound(src, name, artist){
     sound = new Howl({
         src: src,
         onend: function(){
@@ -74,6 +74,13 @@ function loadSound(src, name){
     });
 
     $('#nowPlaying').text(name.slice(0,-4))
+
+    console.log(artist)
+
+    if(artist != undefined){
+        $('#nowPlayingArtist').text(artist)
+        $('#nowPlayingArtist').toggleClass('hidden')
+    }
 }
 
 $('#playClick').on("click", function(){
@@ -100,6 +107,10 @@ function soundStop(){
         $('.libraryItem').text("▶")
         $('.libraryItem').attr("data-playing", false)
         $('.libraryItem').attr("data-paused", false)
+        if($("#nowPlayingArtist").hasClass('hidden') == false){
+            $('#nowPlayingArtist').toggleClass('hidden')
+        }  
+        $('#nowPlaying').text("")
     }
 }
 
@@ -124,12 +135,17 @@ $(document).on("click", '.libraryItem', function(e){
             $('.libraryItem').text("▶")
             // console.log(e.currentTarget.innerText)
             var rootPath = store.get('root_path')
+            if($("#nowPlayingArtist").hasClass('hidden') == false){
+                $('#nowPlayingArtist').toggleClass('hidden')
+            }
             soundStop()
             var path = $(this).attr('data-path')
             fs.readdir(rootPath , async function(err,files){
                 for(var file in files){
                     if(files[file].includes(path)){
-                        loadSound(rootPath + files[file], path)
+                        var metadata = await mm.parseFile(rootPath + "\\" + files[file])
+                        console.log(metadata)
+                        loadSound(rootPath + files[file], path, metadata.common.artist)
                         sound.play()
                         playing = true
                         $('#playClick').text("⏸")
@@ -156,17 +172,25 @@ async function loadLibrary(){
             var path = files[file]
             if(acceptedFiles.includes(path.toLowerCase().slice(-4))){
                 var metadata = await mm.parseFile(rootPath + "\\" + path)
-                // console.log(path, metadata)
-                const divBuilder = $('#library ul').append(`<div class="libItem_${counter} w-[32%] relative"></div>`)
+                console.log(path, metadata)
+                const divBuilder = $('#library ul').append(`<div class="libItem_${counter} md:w-[32%] sm:w-[48%] w-full relative overflow-hidden"></div>`)
                 if(metadata.common.picture != null){
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="data:${metadata.common.picture[0].format};base64,${metadata.common.picture[0].data.toString('base64')}"/>`)
-                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
-                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto  text-white bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem pl-4 pr-4" data-path='${path}' data-playing='false' data-paused='false'>▶</button></div>`)
+                    if(metadata.common.artist != undefined){
+                        $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><div class="w-full"><h2 class="font-bold w-full">${metadata.common.artist}</h2><hr class="mb-2 mt-2"><h2 class="w-full">${path.slice(0,-4)}</h2></div></div>`)
+                    }else{
+                        $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><div class="w-full"><h2 class="w-full">${path.slice(0,-4)}</h2></div></div>`)
+                    }
+                    $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white pl-4 pr-4" data-path='${path}' data-playing='false' data-paused='false' data-artist='${metadata.common.artist}'>▶</button></div>`)
                 }else{
                     $(`.libItem_${counter}`).append(`<div class="absolute bg-black w-full h-full bg-opacity-80 backdrop-blur-sm"></div>`)
                     $(`.libItem_${counter}`).append(`<img class="w-full h-full" src="./storage/blank_icon.jpg"/>`)
-                    $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full top-0 flex flex-col p-8 items-center justify-between text-white text-left z-10 innerBox"><h2>${path.slice(0,-4)}</h2></div>`)
+                    if(metadata.common.artist != undefined){
+                        $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><div class="w-full"><h2 class="font-bold w-full">${metadata.common.artist}</h2><hr class="mb-2 mt-2"><h2 class="w-full">${path.slice(0,-4)}</h2></div></div>`)
+                    }else{
+                        $(`.libItem_${counter}`).append(`<div class="absolute w-full h-full flex flex-col top-0 p-8 items-center justify-between text-white text-left z-10 innerBox"><div class="w-full"><h2 class="w-full">${path.slice(0,-4)}</h2></div></div>`)
+                    }
                     $(`.libItem_${counter} .innerBox`).append(`<div class="flex w-full"><button class="button ml-auto bg-teal-800 p-2 rounded-md hover:bg-teal-900 hover:scale-[125%] transition-all libraryItem text-white pl-4 pr-4" data-path='${path}' data-playing='false' data-paused='false'>▶</button></div>`)
                 }
             }
